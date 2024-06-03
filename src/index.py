@@ -1,3 +1,4 @@
+# Этот файл является точкой входа в приложение
 import telebot
 from telebot import types
 import json
@@ -33,52 +34,42 @@ def send_admin_message(message):
                      "Сообщение отправлено администратору\nожидайте обратной связи, если вы указали свой телефон")
 
 
-token = os.getenv('BOT_TOKEN')
-bot = telebot.TeleBot(token, threaded=False)
-
+token = os.getenv('BOT_TOKEN')  # Получаем токен бота из переменных среды
+bot = telebot.TeleBot(token, threaded=False)  # Создаем экземпляр бота
 
 def handler(event, context):
     print(event)
-    body = json.loads(event['body'])
-    update = telebot.types.Update.de_json(body)
-    bot.process_new_updates([update])
-
+    body = json.loads(event['body'])  # Получаем тело запроса
+    update = telebot.types.Update.de_json(body)  # Преобразуем тело запроса в объект Update
+    bot.process_new_updates([update])  # Обрабатываем новые обновления
 
 @bot.message_handler(commands=['message'])
 def handle_admin_message(message):
-    # Убираем клавиатуру
-    remove_keyboard = types.ReplyKeyboardRemove()
+    remove_keyboard = types.ReplyKeyboardRemove()  # Создаем клавиатуру для удаления
     bot.send_message(message.chat.id,
                      "Введите текст сообщения,\nне забудьте указать ваше имя \n и контактный телефон для обратной связи:",
-                     reply_markup=remove_keyboard)
-    bot.register_next_step_handler(message, send_admin_message)
+                     reply_markup=remove_keyboard)  # Отправляем сообщение с удалением клавиатуры
+    bot.register_next_step_handler(message, send_admin_message)  # Регистрируем следующий обработчик
 
-
-# Обработчик текстовых сообщений от администратора
 @bot.message_handler(commands=['count'])
 def handle_admin_message(message):
-    if isAdmin(message.from_user.id):
-        # Подсчитываем количество пользователей в базе данных
-        users_count = count_users()
-        # Отправляем сообщение с количеством пользователей
-        bot.send_message(message.chat.id, f"Количество подписчиков: {users_count}")
+    if isAdmin(message.from_user.id):  # Проверяем, является ли пользователь администратором
+        users_count = count_users()  # Получаем количество пользователей в базе данных
+        bot.send_message(message.chat.id, f"Количество подписчиков: {users_count}")  # Отправляем сообщение с количеством пользователей
     else:
-        bot.send_message(message.chat.id, "вы не админ")
-
+        bot.send_message(message.chat.id, "вы не админ")  # Отправляем сообщение о том, что пользователь не является администратором
 
 @bot.message_handler(commands=['send_to_all'])
 def send_to_all(message):
-    if isAdmin(message.from_user.id):
-        # Создаем клавиатуру с кнопкой "Отмена"
-        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        cancel_button = types.KeyboardButton('Отмена')
-        keyboard.add(cancel_button)
+    if isAdmin(message.from_user.id):  # Проверяем, является ли пользователь администратором
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)  # Создаем клавиатуру
+        cancel_button = types.KeyboardButton('Отмена')  # Создаем кнопку "Отмена"
+        keyboard.add(cancel_button)  # Добавляем кнопку на клавиатуру
 
-        # Запрашиваем у пользователя текст сообщения
-        bot.send_message(message.chat.id, "Введите текст сообщения для рассылки:", reply_markup=keyboard)
-        bot.register_next_step_handler(message, send_to_all_confirm)
+        bot.send_message(message.chat.id, "Введите текст сообщения для рассылки:", reply_markup=keyboard)  # Запрашиваем у пользователя текст сообщения
+        bot.register_next_step_handler(message, send_to_all_confirm)  # Регистрируем следующий обработчик
     else:
-        bot.send_message(message.chat.id, "Вы не являетесь администратором.")
+        bot.send_message(message.chat.id, "Вы не являетесь администратором.")  # Отправляем сообщение о том, что пользователь не является администратором
 
     # Обрабатываем команду /start
 

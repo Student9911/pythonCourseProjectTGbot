@@ -1,3 +1,4 @@
+# В этом файле почти вся логика связанная с базой данных
 from telebot import types
 import os
 import logging
