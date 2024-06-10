@@ -1,4 +1,8 @@
+import os
+
 # Здесь мы проверяем ID админов для сокращения общего кода в файле index
+
+
 ID_ADMINUS1 = int(os.getenv('IDADMIN'))
 ID_ADMINUS2 = int(os.getenv('IDADMIN2'))
 

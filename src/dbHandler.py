@@ -1,9 +1,13 @@
 # В этом файле почти вся логика связанная с базой данных
+import telebot
 from telebot import types
 import os
 import logging
 import boto3
 from botocore.exceptions import ClientError
+
+token = os.getenv('BOT_TOKEN')
+bot = telebot.TeleBot(token, threaded=False)
 
 
 # Функция подсчета пользователей
@@ -83,7 +87,7 @@ def create_user(user_id, first_name, dynamodb=None):
 
     table = dynamodb.Table('Users')
     try:
-        response = table.put_item(
+        table.put_item(
             Item={
                 'user_id': str(user_id),
                 'first_name': str(first_name)
